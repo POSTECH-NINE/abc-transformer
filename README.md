@@ -137,7 +137,7 @@ ablation heads, 0.4/2.5 GB, are not part of the release — available on request
 ```
 src/
 ├── train.py                   # set `selected_model`, point the config at your CSVs
-├── predict.py                 # inference; set the checkpoint path
+├── predict.py                 # autoregressive inference / evaluation (CLI)
 ├── predict_batched.py         # batched teacher-forcing / autoregressive evaluation
 ├── make_split.py              # reproduce the paper's train/test split (scenario-level, seed 42)
 ├── models/
@@ -150,8 +150,9 @@ src/
 1. Edit `configs/transformer_decoder.yaml` (data paths, `sequence_length`, backbone kwargs — or
    start from the released `config_used.yaml` of the configuration you want to reproduce).
 2. `python train.py` — logs, checkpoints and plots land in `training_logs/`.
-3. `python predict.py` with the checkpoint path for single-scenario rollouts, or use
-   `predict_batched.py` for full-test-set teacher-forcing / autoregressive metrics.
+3. `python predict.py --checkpoint <path/to/epoch=...ckpt>` for the autoregressive
+   rollout + evaluation, or use `predict_batched.py` for full-test-set
+   teacher-forcing / autoregressive metrics.
 
 Loading a released checkpoint directly:
 
