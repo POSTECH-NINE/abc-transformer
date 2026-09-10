@@ -25,5 +25,4 @@ APR1400_TLOFW/CSP_dt05min_seq50_std,epoch=16-val_loss=0.00037441-step=335393.ckp
 APR1400_TLOFW/ECSBS_dt05min_seq50_std,epoch=11-val_loss=0.00052297-step=236844.ckpt,0.00052297,11,4.1,128,8,4,15,10,50,1
 APR1400_LLOCA/CSP_seq50_pred1,epoch=11-val_loss=0.00001009-step=236844.ckpt,1.009e-05,11,10.2,128,8,10,14,10,50,1
 APR1400_LLOCA/ECSBS_seq50_pred1,epoch=7-val_loss=0.00001206-step=157896.ckpt,1.206e-05,7,10.2,128,8,10,14,10,50,1
-APR1400_LLOCA/ECSBS_seq50_pred3,epoch=11-val_loss=0.00009497-step=78852.ckpt,9.497e-05,11,2.6,256,4,6,14,10,50,3
 APR1400_SBO/seq50_pred1,epoch=0-val_loss=0.00002884-step=19368.ckpt,2.884e-05,0,8.1,128,4,8,14,10,50,1

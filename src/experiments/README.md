@@ -1,7 +1,10 @@
 # layer8 multi-seed sweep (Tables 6 / 7 / 8 with mean ± std)
 
+("layer8" = the 8-layer paper configuration of the ABC-Transformer; the released
+`dt15min_seq10_multiseed` Drive set is this sweep's dt15/k=10 cell.)
+
 Purpose: train the ABC-Transformer across **4 intervals × 3 sequence lengths
-(k=3,10,30) × 5 seeds = 60 runs**, evaluate each with **teacher-forcing**
+(k=3,10,30) × 4 seeds = 48 runs**, evaluate each with **teacher-forcing**
 (Table 7) and **autoregressive / rollout** (Table 8), and report per-(interval,k)
 **mean / std / variance** of MAE & RMSE across seeds. Table 6 = the ABC-Transformer
 row only = teacher-forcing, k=3.
@@ -10,7 +13,7 @@ row only = teacher-forcing, k=3.
 
 1. The model config in `sweep_config.py -> BACKBONE_KWARGS` is the paper
    configuration: `d_model=64, nhead=4, num_layers=8, dropout=0.1`
-   (input_size=20, num_continuous=10). Seeds are `[42, 0, 1, 2, 3]` (42 first so
+   (input_size=20, num_continuous=10). Seeds are `[42, 0, 1, 2]` (42 first so
    the first run can be checked against the paper's published Table 7/8 numbers).
 2. Confirm data locations in `sweep_config.py` (defaults expect
    `data/<interval>/` under the repo root; override with `SWEEP_ROOT`).

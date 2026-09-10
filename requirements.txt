@@ -1,9 +1,9 @@
 torch>=2.0
 pytorch-lightning>=2.0
+tensorboard
 numpy
 pandas
 scikit-learn
-scipy
 matplotlib
 tqdm
 PyYAML

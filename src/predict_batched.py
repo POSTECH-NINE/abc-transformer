@@ -1,10 +1,11 @@
 """Batched, faithful re-implementations of the predict.py evaluation passes.
 
-These produce the SAME predictions_dict / true_dict structure as
-  - predict.regressive_predictions_absolute      (teacher-forcing, Table 7)
-  - predict.autoregressive_predictions_absolute   (rollout,        Table 8)
-driven by the same TransformerDataset, but batched so the 60-run sweep is
-tractable (the originals loop one sample at a time -> hours per 5min run).
+These are the reference batched implementations of the two evaluation passes:
+  - regressive_predictions_absolute_batched      (teacher-forcing, Table 7)
+  - autoregressive_predictions_absolute_batched  (rollout,         Table 8)
+driven by the same TransformerDataset as predict.py. (The original one-sample-
+at-a-time teacher-forcing pass was removed in the public release; the rollout
+original survives as predict.autoregressive_predictions_absolute.)
 
 Metrics use compute_micro_macro(), which is mathematically identical to
 scenario_wise_metrics():

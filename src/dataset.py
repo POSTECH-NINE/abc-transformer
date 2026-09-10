@@ -196,7 +196,7 @@ class TransformerDataset(Dataset):
 
     def __getitem__(self, index):
         item = self.base_dataset[index]
-        # First 7 are continuous, rest are binary.
+        # First 10 channels are continuous, the rest are binary.
         x = item["past_values"]
         y = item["future_values"]
         y = y.view(-1)  # Remove the second dimension

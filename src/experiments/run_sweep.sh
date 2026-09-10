@@ -4,14 +4,14 @@
 # until you launch it. Run from the src/ directory.
 #
 #   cd src
-#   bash experiments/run_sweep.sh            # full 4 x 3 x 5 = 60 runs
+#   bash experiments/run_sweep.sh            # full 4 x 3 x 4 = 48 runs
 #   INTERVALS="60min" KS="3" SEEDS="42" bash experiments/run_sweep.sh   # one run
 #
 # Env overrides:
 #   PY        python interpreter (default: python)
 #   INTERVALS space-separated subset (default: 60min 30min 15min 5min)
 #   KS        space-separated seq lengths (default: 3 10 30)
-#   SEEDS     space-separated seeds (default: 42 0 1 2 3)
+#   SEEDS     space-separated seeds (default: 42 0 1 2)
 #   DEVICE    cuda device index (default: 0)
 #   EPOCHS    override max epochs (default: config value, 100)
 set -u
@@ -19,7 +19,7 @@ set -u
 PY="${PY:-python}"
 INTERVALS="${INTERVALS:-60min 30min 15min 5min}"
 KS="${KS:-3 10 30}"
-SEEDS="${SEEDS:-42 0 1 2 3}"
+SEEDS="${SEEDS:-42 0 1 2}"
 DEVICE="${DEVICE:-0}"
 EPOCHS_ARG=""
 [ -n "${EPOCHS:-}" ] && EPOCHS_ARG="--epochs ${EPOCHS}"

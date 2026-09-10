@@ -39,7 +39,7 @@ INTERVALS = ["60min", "30min", "15min", "5min"]
 SEQ_LENS = [3, 10, 30]
 # Representative seeds commonly used in DL reproducibility studies.
 # 42 first so the first full run can be checked against the paper's Table 7/8.
-SEEDS = [42, 0, 1, 2, 3]
+SEEDS = [42, 0, 1, 2]
 
 # Fixed hyperparameters
 BACKBONE_KWARGS = dict(

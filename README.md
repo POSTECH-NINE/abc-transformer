@@ -6,14 +6,14 @@ thermal-hydraulic (TH) states and the prescribed schedule of safety-system / SAM
 model autoregressively forecasts plant behaviour for horizons of up to 72 hours, thousands of
 times faster than the system code (MAAP) it emulates.
 
-Two plants and five accident classes are covered by the released datasets and weights:
+Two plants and five accident classes are covered by the documented datasets and released weights:
 
 | Plant | Accident class | Datasets | Weights |
 |---|---|---|---|
 | **OPR1000** | TLOCCW — total loss of component cooling water | Δt ∈ {5, 15, 30, 60} min | 12 configs (Δt × lookback) + 4-seed set |
 | **APR1400** | LOFW — loss of feedwater | Δt ∈ {5, 15, 30, 60} min | 4 configs |
 | **APR1400** | TLOFW — total loss of feedwater (CSP / ECSBS mitigation variants) | Δt = 5 min, two scalings | 4 configs |
-| **APR1400** | LLOCA — large-break LOCA (CSP / ECSBS) | Δt = 5 min | 3 configs |
+| **APR1400** | LLOCA — large-break LOCA (CSP / ECSBS) | Δt = 5 min | 2 configs |
 | **APR1400** | SBO — station blackout | Δt = 5 min | 1 config |
 
 Model weights: **[Google Drive folder](https://drive.google.com/drive/folders/16rnc8fnhlLg5FmHAX1Oq9zS3kiD2mlJz?usp=drive_link)**
@@ -32,7 +32,11 @@ prediction back while the binary actuation schedule is supplied as known conditi
 | Series | d_model | heads | layers | params | used for |
 |---|---|---|---|---|---|
 | OPR1000 (all) · APR1400 LOFW | 64 | 4 | 8 | ≈ 0.2 M | paper configuration |
-| APR1400 TLOFW / LLOCA / SBO | 128 | 8 | 4 | ≈ 0.8 M | later APR1400 studies |
+| APR1400 TLOFW | 128 | 8 | 4 | ≈ 1.0 M | later APR1400 studies |
+| APR1400 LLOCA | 128 | 8 | 10 | ≈ 2.5 M | later APR1400 studies |
+| APR1400 SBO | 128 | 4 | 8 | ≈ 2.0 M | later APR1400 studies |
+
+Exact per-configuration hyperparameters: `weights_manifest.csv` and each folder's `config_used.yaml`.
 
 ---
 
@@ -49,6 +53,9 @@ they are inputs, not prediction targets.
 
 Scenarios are Monte-Carlo samples over component failure times and operator-action (SAMG)
 timings; each scenario file name encodes its sampled parameter vector.
+
+**Data availability**: the MAAP-generated CSVs are not redistributed via git or Drive; they are
+available from the corresponding authors on reasonable request (see Citation).
 
 ### 2.2 OPR1000 · TLOCCW
 
@@ -86,7 +93,10 @@ Loss-of-feedwater scenario set, resampled at Δt ∈ {5, 15, 30, 60} min
 (`LOFW_data_*min/`). Twelve input channels: **7 continuous** (`PPS`, `TGRCS(10)`, `TGRCS(15)`,
 `PSGGEN(1)`, `ZWDC2SG(1)`, `PEX0(32)` core-exit temperature, `ZWRB(1)`) and **5 SAMG binaries**
 (`SAMG-01 POSRV`, `SAMG-02 SG Injection`, `SAMG-03 RCS Injection`, `SAMG-06 Spray Pump`,
-`SAMG-06 ECSBS`). Lookback k = 12.
+`SAMG-06 ECSBS`). Lookback varies per Δt — 36 / 12 / 6 / 30 steps for the 5 / 15 / 30 / 60 min
+sets (see the `seq_len` column of `weights_manifest.csv`; the weight folders are named `seq12`
+for historical reasons). Note: the shipped dataset pipeline assumes 10 continuous channels —
+adjust the continuous/binary split in `TransformerDataset` for these 7-channel sets.
 
 ### 2.4 APR1400 · TLOFW (CSP / ECSBS)
 
@@ -99,16 +109,18 @@ files in `weights/_normalization/`.
 
 ### 2.5 APR1400 · LLOCA and SBO
 
-Large-break LOCA (CSP / ECSBS variants) and station blackout sets, Δt = 5 min, lookback k = 50,
-same channel convention as TLOFW. LLOCA additionally includes multi-step prediction heads
-trained as an output-horizon ablation (pred_len ∈ {1, 3, 100, 800}; released weights cover 1 and 3).
+Large-break LOCA (CSP / ECSBS variants) and station blackout sets, Δt = 5 min, lookback k = 50.
+Fourteen input channels: the same 10 continuous channels as TLOFW plus **4 SAMG binaries** (one
+fewer than TLOFW — see each `config_used.yaml`). LLOCA additionally includes multi-step
+prediction heads trained as an output-horizon ablation (pred_len ∈ {1, 3, 100, 800}); the
+released weights cover pred_len = 1.
 
 ---
 
 ## 3. Released weights
 
-Layout of the Drive folder (and of `weights/` in this repo's release bundle). Every leaf folder
-contains the best checkpoint (`epoch=…-val_loss=….ckpt`, lowest validation loss) and the exact
+Layout of the Drive folder — download it and place it as `weights/` next to `src/` so the paths
+below (e.g. `weights/_normalization/`) resolve. Every leaf folder contains the best checkpoint (`epoch=…-val_loss=….ckpt`, lowest validation loss) and the exact
 `config_used.yaml` it was trained with.
 
 ```
@@ -118,15 +130,16 @@ weights/
 │   └── dt15min_seq10_multiseed/seed{0,1,2,42}/  # reproducibility set, headline config
 ├── APR1400_LOFW/dt{05,15,30,60}min_seq12/
 ├── APR1400_TLOFW/{CSP,ECSBS}_dt05min_seq50_{minmax,std}/
-├── APR1400_LLOCA/{CSP,ECSBS}_seq50_pred1/  ECSBS_seq50_pred3/
+├── APR1400_LLOCA/{CSP,ECSBS}_seq50_pred1/
 ├── APR1400_SBO/seq50_pred1/
 └── _normalization/                              # min-max / scaler files per dataset
 ```
 
 Full index with validation losses, architecture fields and file sizes: `weights_manifest.csv`.
 Checkpoints are PyTorch-Lightning files; the backbone state dict is under `state_dict` with a
-`backbone.` prefix. Sizes are ~2.6 MB (d64 series) to ~10 MB (d128 series). (The LLOCA `pred100`/`pred800`
-ablation heads, 0.4/2.5 GB, are not part of the release — available on request.)
+`backbone.` prefix. Checkpoints are small: 2.6–10.2 MB (see `size_MB` in `weights_manifest.csv`).
+(The LLOCA multi-step ablation heads — `pred3`/`pred100`/`pred800` — are not part of the release;
+available on request.)
 
 **Headline configuration** (used in the RESS paper): `OPR1000_TLOCCW/dt15min_seq10`.
 
@@ -142,14 +155,20 @@ src/
 ├── make_split.py              # reproduce the paper's train/test split (scenario-level, seed 42)
 ├── models/
 │   ├── model_lightning.py
-│   └── trnasformer_decoder/   # ABC-Transformer backbone (sic)
-├── configs/transformer_decoder.yaml
+│   ├── trnasformer_decoder/   # ABC-Transformer backbone (sic)
+│   └── rnn/, lstm/            # paper baseline models (Table 6 rows)
+├── configs/                   # transformer_decoder / rnn / lstm YAMLs
 └── experiments/               # multi-seed sweep (train / eval / aggregate)
 ```
 
+Requires Python >= 3.10 (developed on 3.11): `pip install -r requirements.txt`.
+
 1. Edit `configs/transformer_decoder.yaml` (data paths, `sequence_length`, backbone kwargs — or
    start from the released `config_used.yaml` of the configuration you want to reproduce).
-2. `python train.py` — logs, checkpoints and plots land in `training_logs/`.
+2. `python train.py` — logs, checkpoints and plots land in `training_logs/`. Baselines: set
+   `selected_model` in `train.py` to `rnn` or `lstm`. (The `training.scheduler` entries in the
+   configs are informational; `configure_optimizers` in `model_lightning.py` defines the actual
+   optimizer — AdamW, lr 1e-3, StepLR step 2 / gamma 0.1.)
 3. `python predict.py --checkpoint <path/to/epoch=...ckpt>` for the autoregressive
    rollout + evaluation, or use `predict_batched.py` for full-test-set
    teacher-forcing / autoregressive metrics.
