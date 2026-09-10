@@ -1,0 +1,49 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.venv/
+venv/
+.env
+
+# ---- datasets (distributed on request, never via git) ----
+*.csv
+*.CSV
+!weights_manifest.csv
+data/
+cache/
+logs/
+
+# ---- training / experiment outputs ----
+training_logs*/
+lightning_logs/
+runs/
+checkpoints/
+error_accumulation/
+step_error*/
+
+# ---- model binaries (released via Drive, not git) ----
+*.ckpt
+*.pt
+*.pth
+
+# ---- figures & media artifacts ----
+plots*/
+viz_frames*/
+*.gif
+*.png
+*.jpg
+*.jpeg
+*.pdf
+# (if the README embeds figures, whitelist them explicitly, e.g. !docs/*.png)
+
+# ---- notebooks (analysis only, not part of the release) ----
+*.ipynb
+
+# ---- local tooling / editors / OS ----
+.omc/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

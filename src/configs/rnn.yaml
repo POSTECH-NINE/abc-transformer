@@ -1,0 +1,28 @@
+# Baseline config (updated to the released 20-channel OPR1000 dataset).
+model:
+  name: rnn
+  backbone_kwargs:
+    input_size: 20
+    hidden_size: 64
+    num_layers: 2
+    device: cuda   # set to cpu if no GPU is available
+    num_continuous: 10
+  lightning_kwargs:
+    tolerance: 0.05
+
+data:
+  data_path: data/15min/combined_sorted_data_normalization_15min_with_CT_PZ_train.csv
+  test_data_path: data/15min/combined_sorted_data_normalization_15min_with_CT_PZ_test.csv
+  sequence_length: 10   # adjust to the experiment you want to reproduce
+  prediction_length: 1
+  batch_size: 32
+
+training:
+  epochs: 20
+  optimizer: adamw
+  lr: 0.001
+  train_split: 0.9
+  scheduler:
+    type: StepLR
+    step_size: 5
+    gamma: 0.2

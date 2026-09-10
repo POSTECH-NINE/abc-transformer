@@ -1,0 +1,30 @@
+# ABC-Transformer - paper headline configuration (OPR1000 TLOCCW, dt=15 min, k=10).
+# Identical to the released weights' config_used.yaml except for the data paths.
+data:
+  batch_size: 128
+  data_path: data/15min/combined_sorted_data_normalization_15min_with_CT_PZ_train.csv
+  test_data_path: data/15min/combined_sorted_data_normalization_15min_with_CT_PZ_test.csv
+  prediction_length: 1
+  prediction_type: absolute
+  sequence_length: 10
+model:
+  backbone_kwargs:
+    d_model: 64
+    dropout: 0.1
+    input_size: 20
+    nhead: 4
+    num_continuous: 10
+    num_layers: 8
+  lightning_kwargs:
+    tolerance: 0.05
+    y_type: continuous_y
+  name: transformer_decoder
+training:
+  epochs: 100
+  lr: 0.001
+  optimizer: adamw
+  scheduler:
+    gamma: 0.2
+    step_size: 5
+    type: StepLR
+  train_split: 0.9

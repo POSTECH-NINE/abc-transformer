@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use this code or the released weights, please cite the ABC-Transformer paper below."
+title: "ABC-Transformer"
+type: software
+license: MIT
+repository-code: "https://github.com/POSTECH-NINE/abc-transformer"
+authors:
+  - family-names: Jeong
+    given-names: Wonung
+    affiliation: "Jeonbuk National University"
+  - family-names: Khanal
+    given-names: Sangam
+    affiliation: "Jeonbuk National University"
+  - family-names: Lee
+    given-names: Jeongik
+    affiliation: "Korea Advanced Institute of Science and Technology (KAIST)"
+  - family-names: Lee
+    given-names: Sangseung
+    affiliation: "Inha University"
+  - family-names: Jeon
+    given-names: Joongoo
+    affiliation: "Pohang University of Science and Technology (POSTECH)"
+preferred-citation:
+  type: article
+  title: "Enhancing Resolution and Reliability with Attention Mechanisms in Nuclear Accident Surrogate Modeling"
+  journal: "Reliability Engineering & System Safety"
+  year: 2026
+  notes: "Under revision; full citation to be updated on acceptance."
+  authors:
+    - family-names: Jeong
+      given-names: Wonung
+    - family-names: Khanal
+      given-names: Sangam
+    - family-names: Lee
+      given-names: Jeongik
+    - family-names: Lee
+      given-names: Sangseung
+    - family-names: Jeon
+      given-names: Joongoo
