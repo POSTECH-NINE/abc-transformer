@@ -16,7 +16,7 @@ Two plants and five accident classes are covered by the released datasets and we
 | **APR1400** | LLOCA — large-break LOCA (CSP / ECSBS) | Δt = 5 min | 3 configs |
 | **APR1400** | SBO — station blackout | Δt = 5 min | 1 config |
 
-Model weights: **[Google Drive folder](https://drive.google.com/drive/folders/1IhY1foMvVT7yi7Au6Y9wvYNjc8dRdHHp?usp=drive_link)**
+Model weights: **[Google Drive folder](https://drive.google.com/drive/folders/16rnc8fnhlLg5FmHAX1Oq9zS3kiD2mlJz?usp=drive_link)**
 (mirrors the `weights/` layout described below; see `weights_manifest.csv` for the full index).
 
 ---
