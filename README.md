@@ -157,8 +157,7 @@ src/
 │   ├── model_lightning.py
 │   ├── trnasformer_decoder/   # ABC-Transformer backbone (sic)
 │   └── rnn/, lstm/            # paper baseline models (Table 6 rows)
-├── configs/                   # transformer_decoder / rnn / lstm YAMLs
-└── experiments/               # multi-seed sweep (train / eval / aggregate)
+└── configs/                   # transformer_decoder / rnn / lstm YAMLs
 ```
 
 Requires Python >= 3.10 (developed on 3.11): `pip install -r requirements.txt`.
