@@ -6,12 +6,11 @@ thermal-hydraulic (TH) states and the prescribed schedule of safety-system / SAM
 model autoregressively forecasts plant behaviour for horizons of up to 72 hours, thousands of
 times faster than the system code (MAAP) it emulates.
 
-Two plants and five accident classes are covered by the documented datasets and released weights:
+Two plants and four accident classes are covered by the documented datasets and released weights:
 
 | Plant | Accident class | Datasets | Weights |
 |---|---|---|---|
 | **OPR1000** | TLOCCW — total loss of component cooling water | Δt ∈ {5, 15, 30, 60} min | 12 configs (Δt × lookback) + 4-seed set |
-| **APR1400** | LOFW — loss of feedwater | Δt ∈ {5, 15, 30, 60} min | 4 configs |
 | **APR1400** | TLOFW — total loss of feedwater (CSP / ECSBS mitigation variants) | Δt = 5 min, two scalings | 4 configs |
 | **APR1400** | LLOCA — large-break LOCA (CSP / ECSBS) | Δt = 5 min | 2 configs |
 | **APR1400** | SBO — station blackout | Δt = 5 min | 1 config |
@@ -31,7 +30,7 @@ prediction back while the binary actuation schedule is supplied as known conditi
 
 | Series | d_model | heads | layers | params | used for |
 |---|---|---|---|---|---|
-| OPR1000 (all) · APR1400 LOFW | 64 | 4 | 8 | ≈ 0.2 M | paper configuration |
+| OPR1000 (all) | 64 | 4 | 8 | ≈ 0.2 M | paper configuration |
 | APR1400 TLOFW | 128 | 8 | 4 | ≈ 1.0 M | later APR1400 studies |
 | APR1400 LLOCA | 128 | 8 | 10 | ≈ 2.5 M | later APR1400 studies |
 | APR1400 SBO | 128 | 4 | 8 | ≈ 2.0 M | later APR1400 studies |
@@ -88,18 +87,7 @@ correspondingly ill-conditioned — relevant if you build Mahalanobis-type diagn
 operation / disable / failure times (e.g. `HPI` is active between `HPI_operation` and
 `HPI_disabled`; injection cutoffs coincide with RWST depletion).
 
-### 2.3 APR1400 · LOFW
-
-Loss-of-feedwater scenario set, resampled at Δt ∈ {5, 15, 30, 60} min
-(`LOFW_data_*min/`). Twelve input channels: **7 continuous** (`PPS`, `TGRCS(10)`, `TGRCS(15)`,
-`PSGGEN(1)`, `ZWDC2SG(1)`, `PEX0(32)` core-exit temperature, `ZWRB(1)`) and **5 SAMG binaries**
-(`SAMG-01 POSRV`, `SAMG-02 SG Injection`, `SAMG-03 RCS Injection`, `SAMG-06 Spray Pump`,
-`SAMG-06 ECSBS`). Lookback varies per Δt — 36 / 12 / 6 / 30 steps for the 5 / 15 / 30 / 60 min
-sets (see the `seq_len` column of `weights_manifest.csv`; the weight folders are named `seq12`
-for historical reasons). Note: the shipped dataset pipeline assumes 10 continuous channels —
-adjust the continuous/binary split in `TransformerDataset` for these 7-channel sets.
-
-### 2.4 APR1400 · TLOFW (CSP / ECSBS)
+### 2.3 APR1400 · TLOFW (CSP / ECSBS)
 
 Total-loss-of-feedwater sets in two mitigation variants — containment spray pump (**CSP**) versus
 emergency containment spray backup system (**ECSBS**) — at Δt = 5 min. Fifteen input channels:
@@ -108,7 +96,7 @@ emergency containment spray backup system (**ECSBS**) — at Δt = 5 min. Fiftee
 Each variant ships in two scalings — 0.1–0.9 min–max and standard-scaled (matching scaler
 statistics are distributed with the datasets on request).
 
-### 2.5 APR1400 · LLOCA and SBO
+### 2.4 APR1400 · LLOCA and SBO
 
 Large-break LOCA (CSP / ECSBS variants) and station blackout sets, Δt = 5 min, lookback k = 50.
 Fourteen input channels: the same 10 continuous channels as TLOFW plus **4 SAMG binaries** (one
@@ -130,7 +118,6 @@ weights/
 │   ├── dt{05,15,30,60}min_seq{03,10,30}/        # 12 = 4 intervals x 3 lookbacks
 │   └── dt15min_seq10_multiseed/seed{0,1,2,42}/  # reproducibility set, headline config
 └── APR1400/                                     # one folder per accident type x mitigation
-    ├── LOFW/dt{05,15,30,60}min_seq12/
     ├── TLOFW_CSP/dt05min_seq50_{minmax,std}/
     ├── TLOFW_ECSBS/dt05min_seq50_{minmax,std}/
     ├── LLOCA_CSP/seq50_pred1/
