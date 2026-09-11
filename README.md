@@ -100,7 +100,7 @@ variants, are available on request).
 
 Large-break LOCA (CSP / ECSBS variants) and station blackout sets, Δt = 5 min, lookback k = 50.
 Fourteen input channels: the same 10 continuous channels as TLOFW plus **4 SAMG binaries** (one
-fewer than TLOFW — see each `config_used.yaml`). LLOCA additionally includes multi-step
+fewer than TLOFW — see `input_size` in each `config_used.yaml`). LLOCA additionally includes multi-step
 prediction heads trained as an output-horizon ablation (pred_len ∈ {1, 3, 100, 800}); the
 released weights cover pred_len = 1.
 
@@ -144,6 +144,8 @@ src/
 ├── predict.py                 # autoregressive inference / evaluation (CLI)
 ├── predict_batched.py         # batched teacher-forcing / autoregressive evaluation
 ├── make_split.py              # reproduce the paper's train/test split (scenario-level, seed 42)
+├── dataset.py, utils.py       # windowed dataset + config/data loading helpers
+├── model_selector.py          # name -> model class registry
 ├── models/
 │   ├── model_lightning.py
 │   ├── trnasformer_decoder/   # ABC-Transformer backbone (sic)
