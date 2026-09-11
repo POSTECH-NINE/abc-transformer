@@ -45,9 +45,9 @@ Exact per-configuration hyperparameters: `weights_manifest.csv` and each folder'
 
 CSV, long format: one row per `(scenario_number, TIME)`.
 `TIME` is in **seconds** (rows advance in steps of the dataset's Δt; raw MAAP dumps advance in
-≈ 3610 s increments). Continuous channels are min–max normalized to [0, 1] per dataset (the
-normalization/scaler statistics needed to recover physical units are distributed together with
-the datasets, on request — they are not part of the public release).
+≈ 3610 s increments). Continuous channels are min–max normalized to [0, 1] per dataset. The
+min–max bounds needed to recover physical units ship in `weights/_normalization/`; other scaler
+statistics (e.g. for the standard-scaled variants) are distributed with the datasets on request.
 Binary channels encode component/SAMG state as **0.8 = active, 0.2 = inactive** (0.5 threshold);
 they are inputs, not prediction targets.
 
@@ -93,8 +93,8 @@ Total-loss-of-feedwater sets in two mitigation variants — containment spray pu
 emergency containment spray backup system (**ECSBS**) — at Δt = 5 min. Fifteen input channels:
 **10 continuous** (`PPS`, `TGRCS(10)`, `TGRCS(15)`, `PSGGEN(1)`, `ZWDC2SG(1)`, `ZWRB(1)`,
 `PEX0(17)`, `TWSG(1)`, `TGRB(17)`, `ZWRB(6)`) and the same **5 SAMG binaries**. Lookback k = 50.
-Each variant ships in two scalings — 0.1–0.9 min–max and standard-scaled (matching scaler
-statistics are distributed with the datasets on request).
+Each variant ships in two scalings — 0.1–0.9 min–max and standard-scaled. The min–max bounds
+are in `weights/_normalization/`; the standard-scaler statistics are available on request.
 
 ### 2.4 APR1400 · LLOCA and SBO
 
@@ -117,12 +117,13 @@ weights/
 ├── OPR1000/                                     # TLOCCW (single accident class)
 │   ├── dt{05,15,30,60}min_seq{03,10,30}/        # 12 = 4 intervals x 3 lookbacks
 │   └── dt15min_seq10_multiseed/seed{0,1,2,42}/  # reproducibility set, headline config
-└── APR1400/                                     # one folder per accident type x mitigation
-    ├── TLOFW_CSP/dt05min_seq50_{minmax,std}/
-    ├── TLOFW_ECSBS/dt05min_seq50_{minmax,std}/
-    ├── LLOCA_CSP/seq50_pred1/
-    ├── LLOCA_ECSBS/seq50_pred1/
-    └── SBO/seq50_pred1/
+├── APR1400/                                     # one folder per accident type x mitigation
+│   ├── TLOFW_CSP/dt05min_seq50_{minmax,std}/
+│   ├── TLOFW_ECSBS/dt05min_seq50_{minmax,std}/
+│   ├── LLOCA_CSP/seq50_pred1/
+│   ├── LLOCA_ECSBS/seq50_pred1/
+│   └── SBO/seq50_pred1/
+└── _normalization/                              # min-max bounds (OPR1000, TLOFW minmax)
 ```
 
 Full index with validation losses, architecture fields and file sizes: `weights_manifest.csv`.
@@ -218,8 +219,8 @@ the cross-channel mean at each instant, not a per-channel time mean.
   emulation given a prescribed mitigation sequence.
 - Autoregressive error grows with horizon (exposure bias); reliability should be assessed
   per scenario (distribution-level), not from aggregate means alone.
-- Normalized errors translate to physical units via the dataset scaler statistics
-  (distributed with the datasets on request).
+- Normalized errors translate to physical units via the min–max bounds in
+  `weights/_normalization/` (standard-scaled variants: statistics on request).
 
 ## License
 
