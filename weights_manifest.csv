@@ -17,8 +17,6 @@ OPR1000/dt15min_seq10_multiseed/seed1,epoch=19-val_loss=0.00021523-step=387160.c
 OPR1000/dt15min_seq10_multiseed/seed2,epoch=13-val_loss=0.00021189-step=271012.ckpt,0.00021189,13,2.6,64,4,8,20,10,10,1
 APR1400/TLOFW_CSP/dt05min_seq50_minmax,epoch=10-val_loss=0.00000837-step=217019.ckpt,8.37e-06,10,4.1,128,8,4,15,10,50,1
 APR1400/TLOFW_ECSBS/dt05min_seq50_minmax,epoch=7-val_loss=0.00001033-step=157896.ckpt,1.033e-05,7,4.1,128,8,4,15,10,50,1
-APR1400/TLOFW_CSP/dt05min_seq50_std,epoch=16-val_loss=0.00037441-step=335393.ckpt,0.00037441,16,4.1,128,8,4,15,10,50,1
-APR1400/TLOFW_ECSBS/dt05min_seq50_std,epoch=11-val_loss=0.00052297-step=236844.ckpt,0.00052297,11,4.1,128,8,4,15,10,50,1
 APR1400/LLOCA_CSP/seq50_pred1,epoch=11-val_loss=0.00001009-step=236844.ckpt,1.009e-05,11,10.2,128,8,10,14,10,50,1
 APR1400/LLOCA_ECSBS/seq50_pred1,epoch=7-val_loss=0.00001206-step=157896.ckpt,1.206e-05,7,10.2,128,8,10,14,10,50,1
 APR1400/SBO/seq50_pred1,epoch=0-val_loss=0.00002884-step=19368.ckpt,2.884e-05,0,8.1,128,4,8,14,10,50,1

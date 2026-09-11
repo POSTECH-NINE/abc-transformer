@@ -11,7 +11,7 @@ Two plants and four accident classes are covered by the documented datasets and 
 | Plant | Accident class | Datasets | Weights |
 |---|---|---|---|
 | **OPR1000** | TLOCCW — total loss of component cooling water | Δt ∈ {5, 15, 30, 60} min | 12 configs (Δt × lookback) + 4-seed set |
-| **APR1400** | TLOFW — total loss of feedwater (CSP / ECSBS mitigation variants) | Δt = 5 min, two scalings | 4 configs |
+| **APR1400** | TLOFW — total loss of feedwater (CSP / ECSBS mitigation variants) | Δt = 5 min | 2 configs |
 | **APR1400** | LLOCA — large-break LOCA (CSP / ECSBS) | Δt = 5 min | 2 configs |
 | **APR1400** | SBO — station blackout | Δt = 5 min | 1 config |
 
@@ -93,8 +93,8 @@ Total-loss-of-feedwater sets in two mitigation variants — containment spray pu
 emergency containment spray backup system (**ECSBS**) — at Δt = 5 min. Fifteen input channels:
 **10 continuous** (`PPS`, `TGRCS(10)`, `TGRCS(15)`, `PSGGEN(1)`, `ZWDC2SG(1)`, `ZWRB(1)`,
 `PEX0(17)`, `TWSG(1)`, `TGRB(17)`, `ZWRB(6)`) and the same **5 SAMG binaries**. Lookback k = 50.
-Each variant ships in two scalings — 0.1–0.9 min–max and standard-scaled. The min–max bounds
-are in `weights/_normalization/`; the standard-scaler statistics are available on request.
+The released weights use the 0.1–0.9 min–max scaling, with the bounds in
+`weights/_normalization/` (standard-scaled variants exist and are available on request).
 
 ### 2.4 APR1400 · LLOCA and SBO
 
@@ -118,8 +118,8 @@ weights/
 │   ├── dt{05,15,30,60}min_seq{03,10,30}/        # 12 = 4 intervals x 3 lookbacks
 │   └── dt15min_seq10_multiseed/seed{0,1,2,42}/  # reproducibility set, headline config
 ├── APR1400/                                     # one folder per accident type x mitigation
-│   ├── TLOFW_CSP/dt05min_seq50_{minmax,std}/
-│   ├── TLOFW_ECSBS/dt05min_seq50_{minmax,std}/
+│   ├── TLOFW_CSP/dt05min_seq50_minmax/
+│   ├── TLOFW_ECSBS/dt05min_seq50_minmax/
 │   ├── LLOCA_CSP/seq50_pred1/
 │   ├── LLOCA_ECSBS/seq50_pred1/
 │   └── SBO/seq50_pred1/
@@ -220,7 +220,7 @@ the cross-channel mean at each instant, not a per-channel time mean.
 - Autoregressive error grows with horizon (exposure bias); reliability should be assessed
   per scenario (distribution-level), not from aggregate means alone.
 - Normalized errors translate to physical units via the min–max bounds in
-  `weights/_normalization/` (standard-scaled variants: statistics on request).
+  `weights/_normalization/`.
 
 ## License
 
