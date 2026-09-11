@@ -109,7 +109,8 @@ released weights cover pred_len = 1.
 ## 3. Released weights
 
 Layout of the Drive folder — download it and place it as `weights/` next to `src/`.
-Every leaf folder contains the best checkpoint (`epoch=…-val_loss=….ckpt`, lowest validation loss) and the exact
+Every leaf folder contains the best checkpoint as `model.ckpt` (lowest validation loss — the
+loss, epoch and original filename are recorded in `weights_manifest.csv`) and the exact
 `config_used.yaml` it was trained with.
 
 ```
@@ -118,11 +119,11 @@ weights/
 │   ├── dt{05,15,30,60}min_seq{03,10,30}/        # 12 = 4 intervals x 3 lookbacks
 │   └── dt15min_seq10_multiseed/seed{0,1,2,42}/  # reproducibility set, headline config
 ├── APR1400/                                     # one folder per accident type x mitigation
-│   ├── TLOFW_CSP/dt05min_seq50_minmax/
-│   ├── TLOFW_ECSBS/dt05min_seq50_minmax/
-│   ├── LLOCA_CSP/seq50_pred1/
-│   ├── LLOCA_ECSBS/seq50_pred1/
-│   └── SBO/seq50_pred1/
+│   ├── TLOFW_CSP/dt05min_seq50/
+│   ├── TLOFW_ECSBS/dt05min_seq50/
+│   ├── LLOCA_CSP/dt05min_seq50/
+│   ├── LLOCA_ECSBS/dt05min_seq50/
+│   └── SBO/dt05min_seq50/
 └── _normalization/                              # min-max bounds (OPR1000, TLOFW minmax)
 ```
 
