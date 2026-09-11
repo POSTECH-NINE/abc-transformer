@@ -47,7 +47,8 @@ Exact per-configuration hyperparameters: `weights_manifest.csv` and each folder'
 CSV, long format: one row per `(scenario_number, TIME)`.
 `TIME` is in **seconds** (rows advance in steps of the dataset's Δt; raw MAAP dumps advance in
 ≈ 3610 s increments). Continuous channels are min–max normalized to [0, 1] per dataset (the
-`weights/_normalization/` folder holds the min/max/scale files needed to recover physical units).
+normalization/scaler statistics needed to recover physical units are distributed together with
+the datasets, on request — they are not part of the public release).
 Binary channels encode component/SAMG state as **0.8 = active, 0.2 = inactive** (0.5 threshold);
 they are inputs, not prediction targets.
 
@@ -104,8 +105,8 @@ Total-loss-of-feedwater sets in two mitigation variants — containment spray pu
 emergency containment spray backup system (**ECSBS**) — at Δt = 5 min. Fifteen input channels:
 **10 continuous** (`PPS`, `TGRCS(10)`, `TGRCS(15)`, `PSGGEN(1)`, `ZWDC2SG(1)`, `ZWRB(1)`,
 `PEX0(17)`, `TWSG(1)`, `TGRB(17)`, `ZWRB(6)`) and the same **5 SAMG binaries**. Lookback k = 50.
-Each variant ships in two scalings — 0.1–0.9 min–max and standard-scaled — with matching scaler
-files in `weights/_normalization/`.
+Each variant ships in two scalings — 0.1–0.9 min–max and standard-scaled (matching scaler
+statistics are distributed with the datasets on request).
 
 ### 2.5 APR1400 · LLOCA and SBO
 
@@ -119,20 +120,22 @@ released weights cover pred_len = 1.
 
 ## 3. Released weights
 
-Layout of the Drive folder — download it and place it as `weights/` next to `src/` so the paths
-below (e.g. `weights/_normalization/`) resolve. Every leaf folder contains the best checkpoint (`epoch=…-val_loss=….ckpt`, lowest validation loss) and the exact
+Layout of the Drive folder — download it and place it as `weights/` next to `src/`.
+Every leaf folder contains the best checkpoint (`epoch=…-val_loss=….ckpt`, lowest validation loss) and the exact
 `config_used.yaml` it was trained with.
 
 ```
 weights/
-├── OPR1000_TLOCCW/
+├── OPR1000/                                     # TLOCCW (single accident class)
 │   ├── dt{05,15,30,60}min_seq{03,10,30}/        # 12 = 4 intervals x 3 lookbacks
 │   └── dt15min_seq10_multiseed/seed{0,1,2,42}/  # reproducibility set, headline config
-├── APR1400_LOFW/dt{05,15,30,60}min_seq12/
-├── APR1400_TLOFW/{CSP,ECSBS}_dt05min_seq50_{minmax,std}/
-├── APR1400_LLOCA/{CSP,ECSBS}_seq50_pred1/
-├── APR1400_SBO/seq50_pred1/
-└── _normalization/                              # min-max / scaler files per dataset
+└── APR1400/                                     # one folder per accident type x mitigation
+    ├── LOFW/dt{05,15,30,60}min_seq12/
+    ├── TLOFW_CSP/dt05min_seq50_{minmax,std}/
+    ├── TLOFW_ECSBS/dt05min_seq50_{minmax,std}/
+    ├── LLOCA_CSP/seq50_pred1/
+    ├── LLOCA_ECSBS/seq50_pred1/
+    └── SBO/seq50_pred1/
 ```
 
 Full index with validation losses, architecture fields and file sizes: `weights_manifest.csv`.
@@ -141,7 +144,7 @@ Checkpoints are PyTorch-Lightning files; the backbone state dict is under `state
 (The LLOCA multi-step ablation heads — `pred3`/`pred100`/`pred800` — are not part of the release;
 available on request.)
 
-**Headline configuration** (used in the RESS paper): `OPR1000_TLOCCW/dt15min_seq10`.
+**Headline configuration** (used in the RESS paper): `OPR1000/dt15min_seq10`.
 
 ---
 
@@ -228,7 +231,8 @@ the cross-channel mean at each instant, not a per-channel time mean.
   emulation given a prescribed mitigation sequence.
 - Autoregressive error grows with horizon (exposure bias); reliability should be assessed
   per scenario (distribution-level), not from aggregate means alone.
-- Normalized errors translate to physical units via the files in `weights/_normalization/`.
+- Normalized errors translate to physical units via the dataset scaler statistics
+  (distributed with the datasets on request).
 
 ## License
 
