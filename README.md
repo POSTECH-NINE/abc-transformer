@@ -194,14 +194,40 @@ Averaged over the 10 continuous channels and 1,100 held-out scenarios (normalize
 
 Per-scenario R² over the rollout: median 0.966; 1.2 % of scenarios fall below R² = 0.
 
-Scheduled sampling (replacing the newest continuous input with the model's own detached
-prediction, probability annealed 0 → 0.5; `train_ss.py`) lowers the autoregressive error in
-11 of the 12 (Δt, k) configurations — e.g. the headline configuration improves to
-MAE 0.0257 / RMSE 0.0468 — with the largest gains at k = 10 and k = 30. The trained variants
-are released under `OPR1000_SS/`. Scheduled-sampling checkpoints are raw `state_dict` files
-(`torch.load(...)` directly, no `backbone.` prefix).
+### Scheduled-sampling variants (`OPR1000_SS/`)
 
-Seed sensitivity (4 seeds, identical protocol): teacher forcing is seed-stable to four decimals
+Autoregressive rollout suffers from exposure bias: training always conditions on ground-truth
+windows, deployment conditions on the model's own (imperfect) predictions. The `OPR1000_SS`
+weight set mitigates this with scheduled sampling (`train_ss.py`): during training, the most
+recent continuous input row is replaced by the model's own detached one-step prediction with a
+per-sample probability p, annealed 0 → 0.5 over 8 epochs and then held. The target, loss,
+architecture and data are identical to the baseline — only the input conditioning changes.
+Validation uses pure teacher forcing.
+
+Autoregressive test error, baseline → scheduled sampling (macro MAE / RMSE, same protocol as
+the table above; 1,100 held-out scenarios):
+
+| Δt \ k | 3 | 10 | 30 |
+|---|---|---|---|
+| 60 min | .0379/.0633 → **.0222/.0391** | .0385/.0641 → **.0170/.0295** | .0224/.0383 → **.0129/.0225** |
+| 30 min | .0359/.0603 → **.0298/.0531** | .0332/.0569 → **.0189/.0340** | .0321/.0535 → **.0154/.0276** |
+| 15 min | .0498/.0807 → .0519/.0845 | .0413/.0697 → **.0257/.0468** | .0458/.0767 → **.0207/.0369** |
+| 5 min | .0852/.1344 → **.0723/.1163** | .0915/.1351 → **.0457/.0749** | .0901/.1341 → **.0544/.0852** |
+
+Improvement in 11 of 12 configurations (up to −56% MAE; the one exception is Δt = 15 min,
+k = 3). Gains are largest for k ≥ 10 — with a 3-step window the model has too little context
+to absorb its own prediction noise. One-step accuracy is intentionally traded away
+(the input is corrupted during training); the win comes from a flatter error-accumulation
+curve over the 72 h rollout. Per-config validation losses and evaluation metrics ship with
+the weights (`ss_manifest.csv`, and `eval_metrics.json` in each folder).
+
+**Loading note**: unlike the Lightning baselines, `OPR1000_SS` checkpoints are raw
+`state_dict` files — `model.load_state_dict(torch.load(path))` directly, no `backbone.`
+prefix to strip.
+
+### Seed sensitivity
+
+Four seeds, identical protocol: teacher forcing is seed-stable to four decimals
 (0.0030 ± 0.0000 / 0.0055 ± 0.0000) while the autoregressive metrics vary run-to-run
 (0.0467 ± 0.0026 / 0.0764 ± 0.0033) — single-seed AR numbers should be read with that spread in
 mind. The four seeds are released in `dt15min_seq10_multiseed/`.
