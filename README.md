@@ -10,7 +10,7 @@ Two plants and four accident classes are covered by the documented datasets and 
 
 | Plant | Accident class | Datasets | Weights |
 |---|---|---|---|
-| **OPR1000** | TLOCCW — total loss of component cooling water | Δt ∈ {5, 15, 30, 60} min | 12 configs (Δt × lookback) + 4-seed set |
+| **OPR1000** | TLOCCW — total loss of component cooling water | Δt ∈ {5, 15, 30, 60} min | 12 configs (Δt × lookback) + 4-seed set + 12 scheduled-sampling configs |
 | **APR1400** | TLOFW — total loss of feedwater (CSP / ECSBS mitigation variants) | Δt = 5 min | 2 configs |
 | **APR1400** | LLOCA — large-break LOCA (CSP / ECSBS) | Δt = 5 min | 2 configs |
 | **APR1400** | SBO — station blackout | Δt = 5 min | 1 config |
@@ -118,6 +118,7 @@ weights/
 ├── OPR1000/                                     # TLOCCW (single accident class)
 │   ├── dt{05,15,30,60}min_seq{03,10,30}/        # 12 = 4 intervals x 3 lookbacks
 │   └── dt15min_seq10_multiseed/seed{0,1,2,42}/  # reproducibility set, headline config
+├── OPR1000_SS/dt{05,15,30,60}min_seq{03,10,30}/ # scheduled-sampling variants (train_ss.py)
 └── APR1400/                                     # one folder per accident type x mitigation
     ├── TLOFW_CSP/dt05min_seq50/
     ├── TLOFW_ECSBS/dt05min_seq50/
@@ -144,6 +145,7 @@ src/
 ├── predict.py                 # autoregressive inference / evaluation (CLI)
 ├── predict_batched.py         # batched teacher-forcing / autoregressive evaluation
 ├── make_split.py              # reproduce the paper's train/test split (scenario-level, seed 42)
+├── train_ss.py                # scheduled-sampling training (exposure-bias mitigation)
 ├── dataset.py, utils.py       # windowed dataset + config/data loading helpers
 ├── model_selector.py          # name -> model class registry
 ├── models/
@@ -191,6 +193,13 @@ Averaged over the 10 continuous channels and 1,100 held-out scenarios (normalize
 | Autoregressive rollout (72 h) | 0.0413 | 0.0697 |
 
 Per-scenario R² over the rollout: median 0.966; 1.2 % of scenarios fall below R² = 0.
+
+Scheduled sampling (replacing the newest continuous input with the model's own detached
+prediction, probability annealed 0 → 0.5; `train_ss.py`) lowers the autoregressive error in
+11 of the 12 (Δt, k) configurations — e.g. the headline configuration improves to
+MAE 0.0257 / RMSE 0.0468 — with the largest gains at k = 10 and k = 30. The trained variants
+are released under `OPR1000_SS/`. Scheduled-sampling checkpoints are raw `state_dict` files
+(`torch.load(...)` directly, no `backbone.` prefix).
 
 Seed sensitivity (4 seeds, identical protocol): teacher forcing is seed-stable to four decimals
 (0.0030 ± 0.0000 / 0.0055 ± 0.0000) while the autoregressive metrics vary run-to-run
