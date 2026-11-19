@@ -10,7 +10,7 @@ Two plants and four accident classes are covered by the documented datasets and 
 
 | Plant | Accident class | Datasets | Weights |
 |---|---|---|---|
-| **OPR1000** | TLOCCW — total loss of component cooling water | Δt ∈ {5, 15, 30, 60} min | 12 configs (Δt × lookback) + 4-seed set + 12 scheduled-sampling configs |
+| **OPR1000** | TLOCCW — total loss of component cooling water | Δt ∈ {5, 15, 30, 60} min | 12 configs (Δt × lookback) + 4-seed set; scheduled sampling: 12 configs + 4-seed set |
 | **APR1400** | TLOFW — total loss of feedwater (CSP / ECSBS mitigation variants) | Δt = 5 min | 2 configs |
 | **APR1400** | LLOCA — large-break LOCA (CSP / ECSBS) | Δt = 5 min | 2 configs |
 | **APR1400** | SBO — station blackout | Δt = 5 min | 1 config |
@@ -118,7 +118,9 @@ weights/
 ├── OPR1000/                                     # TLOCCW (single accident class)
 │   ├── dt{05,15,30,60}min_seq{03,10,30}/        # 12 = 4 intervals x 3 lookbacks
 │   └── dt15min_seq10_multiseed/seed{0,1,2,42}/  # reproducibility set, headline config
-├── OPR1000_SS/dt{05,15,30,60}min_seq{03,10,30}/ # scheduled-sampling variants (train_ss.py)
+├── OPR1000_SS/                                  # scheduled-sampling variants (train_ss.py)
+│   ├── dt{05,15,30,60}min_seq{03,10,30}/
+│   └── dt15min_seq10_multiseed/seed{0,1,2,42}/  # seed0 = dt15min_seq10/
 └── APR1400/                                     # one folder per accident type x mitigation
     ├── TLOFW_CSP/dt05min_seq50/
     ├── TLOFW_ECSBS/dt05min_seq50/
@@ -212,6 +214,8 @@ Averaged over the 10 continuous channels and 1,100 held-out scenarios (normalize
 | Autoregressive rollout (72 h) | 0.0413 | 0.0697 |
 
 Per-scenario R² over the rollout: median 0.966; 1.2 % of scenarios fall below R² = 0.
+Under the pooled R² (the paper's failure label, see *Metric definitions*): median 0.899;
+9.7 % below 0.
 
 ### Scheduled-sampling variants (`OPR1000_SS/`)
 
@@ -240,6 +244,11 @@ to absorb its own prediction noise. One-step accuracy is intentionally traded aw
 curve over the 72 h rollout. Per-config validation losses and evaluation metrics ship with
 the weights (`ss_manifest.csv`, and `eval_metrics.json` in each folder).
 
+A four-seed set of the Δt = 15 min, k = 10 configuration is in
+`OPR1000_SS/dt15min_seq10_multiseed/seed{0,1,2,42}/` (seed0 is the same checkpoint as
+`OPR1000_SS/dt15min_seq10/`). Only the seed differs; each folder's `eval_metrics_full.json`
+reports both R² definitions.
+
 **Loading note**: unlike the Lightning baselines, `OPR1000_SS` checkpoints are raw
 `state_dict` files — `model.load_state_dict(torch.load(path))` directly, no `backbone.`
 prefix to strip.
@@ -249,7 +258,7 @@ prefix to strip.
 Four seeds, identical protocol: teacher forcing is seed-stable to four decimals
 (0.0030 ± 0.0000 / 0.0055 ± 0.0000) while the autoregressive metrics vary run-to-run
 (0.0467 ± 0.0026 / 0.0764 ± 0.0033) — single-seed AR numbers should be read with that spread in
-mind. The four seeds are released in `dt15min_seq10_multiseed/`.
+mind. The four seeds are released in `OPR1000/dt15min_seq10_multiseed/`.
 
 ### Metric definitions
 
@@ -260,10 +269,13 @@ MAE   = 1/(T·C) · Σ_t Σ_c |ŷ_{t,c} − y_{t,c}|
 RMSE  = 1/T · Σ_t sqrt( 1/C · Σ_c (ŷ_{t,c} − y_{t,c})² )      # root inside the time average
 R²(t) = 1 − Σ_c (ŷ_{t,c} − y_{t,c})² / Σ_c (y_{t,c} − ȳ_t)² ,  ȳ_t = 1/C · Σ_c y_{t,c}
 R²    = 1/T · Σ_t R²(t)
+R²_pooled = 1 − Σ_t Σ_c (ŷ_{t,c} − y_{t,c})² / Σ_t Σ_c (y_{t,c} − ȳ_c)² ,  ȳ_c = 1/T · Σ_t y_{t,c}
 ```
 
 Table values average the per-scenario numbers over scenarios ("macro"). Note the R² baseline is
-the cross-channel mean at each instant, not a per-channel time mean.
+the cross-channel mean at each instant, not a per-channel time mean; `predict.py` reports this
+R². R²_pooled uses the per-channel time mean instead. It is the paper's failure label
+(R²_pooled < 0) and the label `distance_screen.py` evaluates against.
 
 ---
 
