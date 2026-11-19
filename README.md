@@ -146,6 +146,7 @@ src/
 ├── predict_batched.py         # batched teacher-forcing / autoregressive evaluation
 ├── make_split.py              # reproduce the paper's train/test split (scenario-level, seed 42)
 ├── train_ss.py                # scheduled-sampling training (exposure-bias mitigation)
+├── distance_screen.py         # Mahalanobis distance screen (d_self / d_retro, flag budget)
 ├── dataset.py, utils.py       # windowed dataset + config/data loading helpers
 ├── model_selector.py          # name -> model class registry
 ├── models/
@@ -180,6 +181,24 @@ model.load_state_dict({re.sub(r"^backbone\.", "", k): v for k, v in sd.items()},
 ```
 
 (For the APR1400 d128 series use the `backbone_kwargs` from its `config_used.yaml`.)
+
+### Reliability screen (Mahalanobis distance)
+
+`distance_screen.py` decides which rollouts to trust. It runs the autoregressive rollout, then
+scores each scenario by the mean Mahalanobis distance of the surrogate's **own** predicted states
+to the training distribution (`d_self`; μ and Σ from the training CSV, Σ + 10⁻⁶ I,
+pseudo-inverse). The threshold is the (1 − f) quantile of `d_self` on a calibration half of the
+test scenarios, with no failure labels involved; rollouts at or above it are flagged for
+confirmation with the system code. `d_retro`, the same distance on the ground-truth trajectory,
+is reported for diagnosis only. Run from `src/`:
+
+```
+python distance_screen.py --checkpoint ../weights/OPR1000/dt15min_seq10/model.ckpt \
+    --config ../weights/OPR1000/dt15min_seq10/config_used.yaml --flag-budget 0.35
+```
+
+The threshold is specific to the checkpoint and data: recalibrate it for any other configuration
+rather than reusing the paper's value.
 
 ---
 
