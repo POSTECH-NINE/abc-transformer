@@ -22,10 +22,12 @@ authors:
     affiliation: "Pohang University of Science and Technology (POSTECH)"
 preferred-citation:
   type: article
-  title: "Enhancing Resolution and Reliability with Attention Mechanisms in Nuclear Accident Surrogate Modeling"
+  title: "Enhancing resolution and reliability with attention mechanisms in nuclear accident surrogate modeling"
   journal: "Reliability Engineering & System Safety"
   year: 2026
-  notes: "Under revision; full citation to be updated on acceptance."
+  start: 113783  # article number
+  doi: "10.1016/j.ress.2026.113783"
+  status: in-press  # volume not yet assigned
   authors:
     - family-names: Jeong
       given-names: Wonung

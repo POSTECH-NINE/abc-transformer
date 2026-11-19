@@ -298,6 +298,18 @@ Code and released weights are distributed under the MIT License (see `LICENSE`).
 
 If you use this code or the weights, please cite (see `CITATION.cff`):
 
-> W. Jeong, S. Khanal, J. Lee, S. Lee, J. Jeon, *Enhancing Resolution and Reliability
-> with Attention Mechanisms in Nuclear Accident Surrogate Modeling*,
-> Reliability Engineering & System Safety (under revision — full citation on acceptance).
+> W. Jeong, S. Khanal, J. Lee, S. Lee, J. Jeon, *Enhancing resolution and reliability
+> with attention mechanisms in nuclear accident surrogate modeling*,
+> Reliability Engineering & System Safety (2026) 113783.
+> https://doi.org/10.1016/j.ress.2026.113783
+
+```bibtex
+@article{jeong2026abctransformer,
+  author  = {Jeong, Wonung and Khanal, Sangam and Lee, Jeongik and Lee, Sangseung and Jeon, Joongoo},
+  title   = {Enhancing resolution and reliability with attention mechanisms in nuclear accident surrogate modeling},
+  journal = {Reliability Engineering \& System Safety},
+  year    = {2026},
+  pages   = {113783},
+  doi     = {10.1016/j.ress.2026.113783}
+}
+```
